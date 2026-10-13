@@ -1,0 +1,16 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+---
+
+<BaseLayout title="Page not found" description="The page you requested does not exist." noindex>
+  <section class="container-content flex flex-col items-start gap-6 py-24 md:py-36">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="text-4xl font-semibold tracking-tight text-fg md:text-5xl">Page not found</h1>
+    <p class="max-w-md text-lg text-fg-muted">The page you are looking for has moved or never existed. The projects gallery is a good place to start.</p>
+    <div class="flex flex-wrap gap-3">
+      <Button href="/" icon="arrow-right">Back to home</Button>
+      <Button href="/#projects" variant="secondary">Browse projects</Button>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,228 @@
+---
+import { render } from 'astro:content';
+import { getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Badge from '@/components/Badge.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import ImageFigure from '@/components/ImageFigure.astro';
+import Gallery from '@/components/Gallery.astro';
+import ProjectMeta from '@/components/ProjectMeta.astro';
+import MetricStat from '@/components/MetricStat.astro';
+import Prose from '@/components/Prose.astro';
+import { getProjects, projectUrl, type Project } from '@/lib/projects';
+import { categoryLabel, TYPE_LABELS } from '@/data/categories';
+import { site } from '@/data/site';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, prev: projects[i - 1] ?? null, next: projects[i + 1] ?? null },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prev: Project | null;
+  next: Project | null;
+}
+
+const { project, prev, next } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+
+const siteUrl = Astro.site ?? new URL(site.url);
+const pageUrl = new URL(projectUrl(project), siteUrl).toString();
+
+let ogImage: string | undefined;
+if (data.hero) {
+  const og = await getImage({
+    src: data.hero.src,
+    width: 1200,
+    height: 630,
+    fit: 'cover',
+    format: 'jpg',
+  });
+  ogImage = new URL(og.src, siteUrl).toString();
+}
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: data.title,
+    description: data.summary,
+    url: pageUrl,
+    image: ogImage,
+    author: { '@type': 'Person', name: site.name, url: site.url },
+    keywords: data.tech.join(', '),
+    ...(data.repo ? { codeRepository: data.repo } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl.toString() },
+      { '@type': 'ListItem', position: 2, name: 'Projects', item: new URL('/#projects', siteUrl).toString() },
+      { '@type': 'ListItem', position: 3, name: data.title, item: pageUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout title={data.title} description={data.summary} ogImage={ogImage} ogType="article" jsonLd={jsonLd}>
+  <article>
+    <header class="border-b border-border">
+      <div class="container-content py-10 md:py-14">
+        <nav aria-label="Breadcrumb" class="mb-6 font-mono text-xs text-fg-subtle">
+          <ol class="flex flex-wrap items-center gap-2">
+            <li><a href="/" class="hover:text-fg">Home</a></li>
+            <li aria-hidden="true">/</li>
+            <li><a href="/#projects" class="hover:text-fg">Projects</a></li>
+            <li aria-hidden="true">/</li>
+            <li class="text-fg-muted" aria-current="page">{data.title}</li>
+          </ol>
+        </nav>
+        <div class="flex flex-wrap items-center gap-2" data-reveal>
+          <Badge variant="category">{categoryLabel(data.category)}</Badge>
+          <Badge variant="type">{TYPE_LABELS[data.type]}</Badge>
+          {data.team && <Badge variant="type">{data.team}</Badge>}
+          {data.sourceStatus === 'closed' && (
+            <Badge variant="type">
+              <Icon name="lock" size={11} />
+              Closed source
+            </Badge>
+          )}
+          {data.collection && <Badge variant="type">Project series</Badge>}
+        </div>
+        <h1 class="mt-4 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-fg md:text-5xl" data-reveal>
+          {data.title}
+        </h1>
+        <p class="mt-4 max-w-3xl text-lg leading-relaxed text-fg-muted md:text-xl" data-reveal data-reveal-delay="60">
+          {data.tagline}
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3" data-reveal data-reveal-delay="120">
+          {
+            data.repo && (
+              <Button href={data.repo} icon="github" iconPosition="left" external>
+                View on GitHub
+              </Button>
+            )
+          }
+          {
+            data.links.map((l, i) => (
+              <Button href={l.url} variant={data.repo || i > 0 ? 'secondary' : 'primary'} icon="arrow-up-right" external>
+                {l.label}
+              </Button>
+            ))
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="container-content grid gap-10 py-10 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-14 md:py-14 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="min-w-0">
+        {
+          data.hero && (
+            <div data-reveal>
+              <ImageFigure
+                src={data.hero.src}
+                alt={data.hero.alt}
+                caption={data.hero.caption}
+                priority
+                widths={[640, 960, 1280, 1600]}
+                sizes="(min-width: 1024px) 800px, 100vw"
+                imgClass="max-h-[34rem] object-contain bg-elevated"
+              />
+            </div>
+          )
+        }
+
+        {
+          data.metrics.length > 0 && (
+            <div class:list={['grid gap-4 sm:grid-cols-2', data.metrics.length >= 3 ? 'lg:grid-cols-3' : '', data.hero ? 'mt-10' : '']}>
+              {data.metrics.map((m, i) => (
+                <div data-reveal data-reveal-delay={String(i * 60)}>
+                  <MetricStat value={m.value} label={m.label} class="h-full" />
+                </div>
+              ))}
+            </div>
+          )
+        }
+
+        <div class:list={[data.hero || data.metrics.length > 0 ? 'mt-12' : '']}>
+          <Prose>
+            <Content />
+          </Prose>
+        </div>
+
+        <Gallery items={data.gallery} />
+
+        {
+          data.credits.length > 0 && (
+            <section aria-labelledby="credits-heading" class="mt-14 rounded-xl border border-border bg-surface p-5 md:p-6">
+              <h2 id="credits-heading" class="text-base font-semibold text-fg">
+                Third-party components and credits
+              </h2>
+              <p class="mt-1 text-sm text-fg-subtle">Frameworks, drivers, datasets, and starter code this project builds on. These are not my work.</p>
+              <ul class="mt-4 flex flex-col gap-2 text-sm">
+                {data.credits.map((c) => (
+                  <li class="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+                    {c.url ? (
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" class="font-medium text-accent-2 hover:underline">
+                        {c.name}
+                      </a>
+                    ) : (
+                      <span class="font-medium text-fg">{c.name}</span>
+                    )}
+                    {c.note && <span class="text-fg-muted">{c.note}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+
+      <div class="md:sticky md:top-24 md:self-start">
+        <ProjectMeta project={project} />
+      </div>
+    </div>
+
+    <nav aria-label="Project navigation" class="border-t border-border">
+      <div class="container-content pt-8">
+        <a href="/#projects" class="inline-flex items-center gap-2 text-sm font-medium text-fg-muted hover:text-fg">
+          <Icon name="arrow-left" size={16} />
+          Back to all projects
+        </a>
+      </div>
+      <div class="container-content grid gap-4 py-8 sm:grid-cols-2">
+        {
+          prev ? (
+            <a href={projectUrl(prev)} class="card card-hover flex items-center gap-3 p-4 text-sm">
+              <Icon name="arrow-left" size={16} class="shrink-0 text-fg-subtle" />
+              <span class="min-w-0">
+                <span class="block font-mono text-[0.6875rem] uppercase tracking-wider text-fg-subtle">Previous</span>
+                <span class="block truncate font-medium text-fg">{prev.data.title}</span>
+              </span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a href={projectUrl(next)} class="card card-hover flex items-center justify-end gap-3 p-4 text-right text-sm">
+              <span class="min-w-0">
+                <span class="block font-mono text-[0.6875rem] uppercase tracking-wider text-fg-subtle">Next</span>
+                <span class="block truncate font-medium text-fg">{next.data.title}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="shrink-0 text-fg-subtle" />
+            </a>
+          )
+        }
+      </div>
+    </nav>
+  </article>
+</BaseLayout>

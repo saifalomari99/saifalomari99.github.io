@@ -1,0 +1,43 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Badge from '@/components/Badge.astro';
+import { getArticles, articleUrl } from '@/lib/projects';
+import { formatLongDate } from '@/lib/dates';
+
+const articles = await getArticles();
+const description = 'Technical articles and notes by Saif Alomari on FPGA design, RTL, verification, and embedded firmware.';
+---
+
+<BaseLayout title="Writing" description={description} noindex={articles.length === 0}>
+  <Section level="h1" eyebrow="Writing" title="Technical notes" intro="Articles on FPGA design, RTL, verification, and embedded firmware.">
+    {
+      articles.length === 0 ? (
+        <p class="card p-6 text-sm text-fg-muted">No articles have been published yet. Check back soon.</p>
+      ) : (
+        <ul class="grid gap-6 md:grid-cols-2">
+          {articles.map((a, i) => (
+            <li class="card card-hover flex flex-col gap-3 p-6" data-reveal data-reveal-delay={String((i % 2) * 70)}>
+              <p class="font-mono text-xs text-fg-subtle">
+                <time datetime={a.data.pubDate.toISOString()}>{formatLongDate(a.data.pubDate)}</time>
+              </p>
+              <h2 class="text-xl font-semibold tracking-tight text-fg">
+                <a href={articleUrl(a)} class="hover:text-accent-2">
+                  {a.data.title}
+                </a>
+              </h2>
+              <p class="text-sm leading-relaxed text-fg-muted">{a.data.description}</p>
+              {a.data.tags.length > 0 && (
+                <div class="mt-auto flex flex-wrap gap-1.5 pt-2">
+                  {a.data.tags.map((t) => (
+                    <Badge>{t}</Badge>
+                  ))}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </Section>
+</BaseLayout>

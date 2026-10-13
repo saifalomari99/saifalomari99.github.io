@@ -1,0 +1,53 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import ImageFigure from './ImageFigure.astro';
+
+interface Item {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  items: Item[];
+  title?: string;
+}
+
+const { items, title = 'Gallery' } = Astro.props;
+
+const resolved = await Promise.all(
+  items.map(async (item) => {
+    const full = await getImage({
+      src: item.src,
+      width: Math.min(1600, item.src.width),
+      format: item.src.format === 'svg' ? 'svg' : 'webp',
+    });
+    return { ...item, fullSrc: full.src };
+  }),
+);
+---
+
+{
+  resolved.length > 0 && (
+    <section aria-labelledby="gallery-heading" class="mt-14">
+      <h2 id="gallery-heading" class="mb-6 text-xl font-semibold tracking-tight text-fg">
+        {title}
+      </h2>
+      <div class:list={['grid gap-6', resolved.length === 1 ? 'grid-cols-1' : 'md:grid-cols-2']}>
+        {resolved.map((item, i) => (
+          <div data-reveal data-reveal-delay={String((i % 2) * 80)}>
+            <ImageFigure
+              src={item.src}
+              alt={item.alt}
+              caption={item.caption}
+              href={item.fullSrc}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 768px) 50vw, 100vw"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

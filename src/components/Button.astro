@@ -1,0 +1,66 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'md' | 'sm';
+  icon?: IconName;
+  iconPosition?: 'left' | 'right';
+  external?: boolean;
+  class?: string;
+  type?: 'button' | 'submit';
+  ariaLabel?: string;
+  [key: `data-${string}`]: string | undefined;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconPosition = 'right',
+  external = false,
+  class: className,
+  type = 'button',
+  ariaLabel,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 rounded-lg font-medium whitespace-nowrap transition-colors duration-200 select-none';
+const sizes = {
+  md: 'h-11 px-5 text-sm',
+  sm: 'h-9 px-4 text-sm',
+};
+const variants = {
+  primary: 'bg-accent text-white hover:bg-[#1d4ed8] shadow-[0_8px_20px_-10px_rgb(37_99_235_/_0.6)]',
+  secondary: 'border border-border-strong bg-surface text-fg hover:border-accent/60 hover:bg-elevated',
+  ghost: 'text-fg-muted hover:text-fg hover:bg-elevated',
+};
+const classes = [base, sizes[size], variants[variant], className];
+const iconSize = size === 'sm' ? 16 : 18;
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class:list={classes}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+      aria-label={ariaLabel}
+      {...rest}
+    >
+      {icon && iconPosition === 'left' && <Icon name={icon} size={iconSize} />}
+      <slot />
+      {icon && iconPosition === 'right' && <Icon name={icon} size={iconSize} />}
+    </a>
+  ) : (
+    <button type={type} class:list={classes} aria-label={ariaLabel} {...rest}>
+      {icon && iconPosition === 'left' && <Icon name={icon} size={iconSize} />}
+      <slot />
+      {icon && iconPosition === 'right' && <Icon name={icon} size={iconSize} />}
+    </button>
+  )
+}

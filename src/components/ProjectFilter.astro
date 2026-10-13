@@ -1,0 +1,31 @@
+---
+import { CATEGORIES } from '@/data/categories';
+
+interface Props {
+  total: number;
+}
+const { total } = Astro.props;
+
+const btn =
+  'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-2 border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg';
+---
+
+<div class="flex flex-col gap-3" data-filter>
+  <div role="group" aria-label="Filter projects by category" class="flex flex-wrap gap-2">
+    <button type="button" class={btn} data-category="all" aria-pressed="true">All</button>
+    {
+      CATEGORIES.map((c) => (
+        <button type="button" class={btn} data-category={c.id} aria-pressed="false">
+          {c.label}
+        </button>
+      ))
+    }
+  </div>
+  <p class="font-mono text-xs text-fg-subtle" aria-live="polite" data-filter-status>
+    Showing all {total} projects
+  </p>
+</div>
+
+<script>
+  import '@/scripts/project-filter';
+</script>

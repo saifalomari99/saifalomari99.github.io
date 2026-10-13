@@ -1,0 +1,77 @@
+---
+import { site } from '@/data/site';
+import { education } from '@/data/education';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute URL of the Open Graph image. Defaults to /og-default.png. */
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  /** Additional JSON-LD objects to emit alongside the Person schema. */
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description, ogImage, ogType = 'website', jsonLd = [], noindex = false } = Astro.props;
+
+const siteUrl = Astro.site ?? new URL(site.url);
+// The 404 page is served for any unknown path, so it has no canonical URL of its own.
+const is404 = Astro.url.pathname.startsWith('/404');
+const canonical = new URL(is404 ? '/' : Astro.url.pathname, siteUrl).toString();
+const image = ogImage ?? new URL('/og-default.png', siteUrl).toString();
+const isHome = Astro.url.pathname === '/';
+const fullTitle = isHome ? `${site.name} | ${site.role}` : `${title} | ${site.name}`;
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.role,
+  url: site.url,
+  image: new URL('/og-default.png', siteUrl).toString(),
+  sameAs: [site.github, site.linkedin],
+  worksFor: { '@type': 'Organization', name: 'Magna Electronics' },
+  alumniOf: education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
+  address: { '@type': 'PostalAddress', addressLocality: 'Goleta', addressRegion: 'CA', addressCountry: 'US' },
+  knowsAbout: ['FPGA Design', 'RTL Design', 'Verilog', 'SystemVerilog', 'Embedded Firmware', 'Digital Hardware Design'],
+};
+const ld = [person, ...jsonLd];
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="author" content={site.name} />
+<meta name="theme-color" content="#fafbfc" />
+<meta name="color-scheme" content="light" />
+{noindex && <meta name="robots" content="noindex" />}
+<link rel="canonical" href={canonical} />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<meta name="generator" content={Astro.generator} />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+<script is:inline>
+  document.documentElement.classList.add('js');
+</script>

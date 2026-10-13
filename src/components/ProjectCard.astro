@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '@/lib/projects';
+import { projectUrl } from '@/lib/projects';
+import { categoryLabel, TYPE_LABELS } from '@/data/categories';
+import { formatRange } from '@/lib/dates';
+import Badge from './Badge.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  project: Project;
+  index?: number;
+}
+
+const { project, index = 0 } = Astro.props;
+const { data } = project;
+const url = projectUrl(project);
+const tech = data.tech.slice(0, 4);
+const more = data.tech.length - tech.length;
+const metaBits = [TYPE_LABELS[data.type], data.team].filter(Boolean);
+
+const thumb = data.thumbnail
+  ? { src: data.thumbnail.src, alt: data.thumbnail.alt, fit: data.thumbnail.fit }
+  : data.hero
+    ? { src: data.hero.src, alt: data.hero.alt, fit: 'cover' as const }
+    : null;
+const placeholderIcon = data.category === 'ml-ai' ? 'layers' : data.category === 'software' ? 'code' : 'cpu';
+---
+
+<li
+  class="list-none"
+  data-project
+  data-category={data.category}
+  data-tags={data.tags.join(' ')}
+  data-reveal
+  data-reveal-delay={String((index % 3) * 70)}
+>
+  <article class="card card-hover group relative flex h-full flex-col overflow-hidden">
+    {
+      thumb ? (
+        <div
+          class:list={[
+            'aspect-[16/10] overflow-hidden border-b border-border bg-elevated',
+            thumb.fit === 'contain' && 'grid place-items-center p-8',
+          ]}
+        >
+          <Image
+            src={thumb.src}
+            alt={thumb.alt}
+            widths={[400, 640, 900]}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            format={thumb.src.format === 'svg' ? 'svg' : 'webp'}
+            loading={index < 3 ? 'eager' : 'lazy'}
+            decoding="async"
+            class:list={[
+              'transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.03]',
+              thumb.fit === 'contain' ? 'max-h-full w-auto max-w-[60%] object-contain' : 'h-full w-full object-cover',
+            ]}
+          />
+        </div>
+      ) : (
+        <div class="grid aspect-[16/10] place-items-center border-b border-border bg-elevated text-fg-subtle">
+          <Icon name={placeholderIcon} size={40} />
+        </div>
+      )
+    }
+    <div class="flex flex-1 flex-col gap-3 p-5">
+      <div class="flex flex-wrap items-center gap-2">
+        {data.tier === 'featured' && <Badge variant="accent">Featured</Badge>}
+        <Badge variant="category">{categoryLabel(data.category, true)}</Badge>
+        {data.sourceStatus === 'closed' && (
+          <Badge variant="type">
+            <Icon name="lock" size={11} />
+            Closed source
+          </Badge>
+        )}
+        {data.collection && <Badge variant="type">Series</Badge>}
+      </div>
+      <h3 class="text-lg font-semibold leading-snug tracking-tight text-fg">
+        <a href={url} class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+          {data.title}
+        </a>
+      </h3>
+      <p class="text-sm leading-relaxed text-fg-muted">{data.tagline}</p>
+      <div class="mt-auto flex flex-col gap-3 pt-2">
+        <p class="font-mono text-[0.6875rem] uppercase tracking-wider text-fg-subtle">
+          {formatRange(data.dates.start, data.dates.end)}
+          {metaBits.length > 0 && <span aria-hidden="true"> &middot; </span>}
+          {metaBits.join(' · ')}
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          {tech.map((t) => <Badge>{t}</Badge>)}
+          {more > 0 && <Badge>+{more}</Badge>}
+        </div>
+      </div>
+    </div>
+    <span
+      class="pointer-events-none absolute right-4 top-4 grid size-8 place-items-center rounded-full border border-border bg-surface/90 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+      aria-hidden="true"
+    >
+      <Icon name="arrow-up-right" size={14} />
+    </span>
+  </article>
+</li>

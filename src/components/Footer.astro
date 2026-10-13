@@ -1,0 +1,44 @@
+---
+import { site } from '@/data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  showWriting?: boolean;
+}
+const { showWriting = false } = Astro.props;
+const navItems = showWriting ? [...site.nav, { label: 'Writing', href: '/writing/' }] : site.nav;
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t border-border bg-surface">
+  <div class="container-content flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p class="font-semibold text-fg">{site.name}</p>
+      <p class="mt-1 text-sm text-fg-subtle">{site.role} &middot; {site.location}</p>
+    </div>
+    <nav aria-label="Footer">
+      <ul class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href} class="text-fg-muted transition-colors hover:text-fg">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="flex items-center gap-1">
+      <a href={site.github} target="_blank" rel="noopener noreferrer" class="rounded-md p-2 text-fg-muted hover:text-fg" aria-label="GitHub profile">
+        <Icon name="github" size={18} />
+      </a>
+      <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="rounded-md p-2 text-fg-muted hover:text-fg" aria-label="LinkedIn profile">
+        <Icon name="linkedin" size={18} />
+      </a>
+    </div>
+  </div>
+  <div class="border-t border-border">
+    <div class="container-content py-4 text-xs text-fg-subtle">&copy; {year} {site.name}. All rights reserved.</div>
+  </div>
+</footer>

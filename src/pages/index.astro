@@ -1,0 +1,147 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import ProjectFilter from '@/components/ProjectFilter.astro';
+import CircuitBackground from '@/components/CircuitBackground.astro';
+import SkillGroup from '@/components/SkillGroup.astro';
+import Badge from '@/components/Badge.astro';
+import Icon from '@/components/Icon.astro';
+import { site, summary } from '@/data/site';
+import { skills } from '@/data/skills';
+import { getProjects, getArticles, articleUrl } from '@/lib/projects';
+import { formatLongDate } from '@/lib/dates';
+import portrait from '@/assets/portrait.jpg';
+
+const projects = await getProjects();
+const articles = (await getArticles()).slice(0, 3);
+const featuredCount = projects.filter((p) => p.data.tier === 'featured').length;
+---
+
+<BaseLayout title="Home" description={site.description}>
+  <!-- Hero -->
+  <section id="top" class="relative overflow-hidden border-b border-border bg-surface">
+    <CircuitBackground />
+    <div class="container-content relative grid gap-10 py-16 md:grid-cols-[1.25fr_minmax(0,1fr)] md:items-center md:py-24">
+      <div class="min-w-0" data-reveal>
+        <p class="eyebrow mb-4">{site.role}</p>
+        <h1 class="text-4xl font-semibold leading-[1.08] tracking-tight text-fg md:text-6xl">
+          Engineering projects by <span class="text-gradient">{site.name}</span>
+        </h1>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-fg-muted md:text-xl">{summary.intro}</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button href="/#projects" icon="arrow-right">Browse the projects</Button>
+          <Button href={site.github} variant="secondary" icon="github" iconPosition="left" external>GitHub</Button>
+          <Button href={site.linkedin} variant="ghost" icon="linkedin" iconPosition="left" external>LinkedIn</Button>
+        </div>
+        <ul class="mt-8 flex flex-wrap gap-2">
+          {['Verilog / SystemVerilog', 'CDC & timing closure', 'MicroBlaze & PIC18 firmware', 'Verification', 'RTL tooling'].map((t) => (
+            <li><Badge>{t}</Badge></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mx-auto w-full max-w-xs md:max-w-sm" data-reveal data-reveal-delay="100">
+        <Image
+          src={portrait}
+          alt="Saif Alomari standing in front of the University of California, Santa Barbara entrance sign."
+          widths={[480, 720, 960]}
+          sizes="(min-width: 768px) 24rem, 20rem"
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+          class="aspect-[4/5] w-full rounded-2xl border border-border object-cover shadow-[0_24px_48px_-24px_rgb(15_23_42_/_0.35)]"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <Section
+    id="projects"
+    eyebrow="Projects"
+    title="Things I've built"
+    intro={`${projects.length} projects: every public repository on my GitHub plus RTLStation. The ${featuredCount} marked Featured are the ones I'd show first. Open any card for the architecture, implementation details, and what I contributed.`}
+  >
+    <a slot="actions" href={site.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg">
+      <Icon name="github" size={16} />
+      github.com/{site.githubHandle}
+      <Icon name="arrow-up-right" size={14} />
+    </a>
+
+    <ProjectFilter total={projects.length} />
+
+    <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-project-group>
+      {projects.map((p, i) => <ProjectCard project={p} index={i} />)}
+    </ul>
+  </Section>
+
+  <!-- Skills -->
+  <Section
+    id="skills"
+    eyebrow="Technical skills"
+    title="What I work with"
+    intro="Languages, tools, interfaces, and lab equipment I have used on real designs, grouped the way a hardware team would read them."
+    class="border-t border-border bg-surface/60"
+  >
+    <div class="grid gap-4 md:grid-cols-2">
+      {skills.map((g, i) => <SkillGroup group={g} index={i} />)}
+    </div>
+  </Section>
+
+  {
+    articles.length > 0 && (
+      <Section id="writing" eyebrow="Writing" title="Recent articles" class="border-t border-border">
+        <Button slot="actions" href="/writing/" variant="secondary" icon="arrow-right">
+          All articles
+        </Button>
+        <ul class="grid gap-6 md:grid-cols-3">
+          {articles.map((a) => (
+            <li class="card card-hover p-5" data-reveal>
+              <p class="font-mono text-xs text-fg-subtle">{formatLongDate(a.data.pubDate)}</p>
+              <h3 class="mt-2 text-lg font-semibold text-fg">
+                <a href={articleUrl(a)}>{a.data.title}</a>
+              </h3>
+              <p class="mt-2 text-sm text-fg-muted">{a.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  <!-- Contact -->
+  <Section id="contact" eyebrow="Contact" title="Get in touch" class="border-t border-border bg-surface/60">
+    <div class="grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start">
+      <p class="max-w-xl text-base leading-relaxed text-fg-muted md:text-lg" data-reveal>
+        I'm happy to talk about embedded firmware, FPGA and RTL design, verification, and engineering tooling, or about
+        roles where that mix is useful. The best way to reach me is a message on LinkedIn, where you will also find my
+        work history, education, and skills.
+      </p>
+      <div class="flex flex-col gap-3" data-reveal data-reveal-delay="100">
+        <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="card card-hover flex items-center gap-4 p-4">
+          <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent" aria-hidden="true">
+            <Icon name="linkedin" size={20} />
+          </span>
+          <span class="min-w-0">
+            <span class="block font-semibold text-fg">LinkedIn</span>
+            <span class="block truncate text-sm text-fg-subtle">linkedin.com/in/saif-alomari-profile</span>
+          </span>
+          <Icon name="arrow-up-right" size={16} class="ml-auto shrink-0 text-fg-subtle" />
+        </a>
+        <a href={site.github} target="_blank" rel="noopener noreferrer" class="card card-hover flex items-center gap-4 p-4">
+          <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent" aria-hidden="true">
+            <Icon name="github" size={20} />
+          </span>
+          <span class="min-w-0">
+            <span class="block font-semibold text-fg">GitHub</span>
+            <span class="block truncate text-sm text-fg-subtle">github.com/{site.githubHandle}</span>
+          </span>
+          <Icon name="arrow-up-right" size={16} class="ml-auto shrink-0 text-fg-subtle" />
+        </a>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

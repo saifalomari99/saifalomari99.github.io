@@ -1,0 +1,99 @@
+---
+import { site } from '@/data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Whether the Writing section has published articles. */
+  showWriting?: boolean;
+}
+
+const { showWriting = false } = Astro.props;
+const navItems = showWriting ? [...site.nav, { label: 'Writing', href: '/writing/' }] : site.nav;
+---
+
+<header class="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-md">
+  <div class="container-content flex h-16 items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-2 rounded-md text-base font-semibold tracking-tight text-fg" aria-label={`${site.name}, back to top`}>
+      <span class="inline-block size-2 rounded-full bg-accent" aria-hidden="true"></span>
+      {site.name}
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+      {
+        navItems.map((item) => (
+          <a href={item.href} class="rounded-md px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:text-fg">
+            {item.label}
+          </a>
+        ))
+      }
+      <div class="ml-2 flex items-center gap-1 border-l border-border pl-3">
+        <a
+          href={site.github}
+          class="rounded-md p-2 text-fg-muted transition-colors hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub profile"
+        >
+          <Icon name="github" size={18} />
+        </a>
+        <a
+          href={site.linkedin}
+          class="rounded-md p-2 text-fg-muted transition-colors hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn profile"
+        >
+          <Icon name="linkedin" size={18} />
+        </a>
+      </div>
+    </nav>
+
+    <button
+      type="button"
+      class="grid size-10 place-items-center rounded-md text-fg-muted hover:bg-elevated hover:text-fg md:hidden"
+      aria-controls="site-menu"
+      aria-expanded="false"
+      aria-label="Open menu"
+      data-nav-toggle
+    >
+      <span data-nav-icon="open"><Icon name="menu" size={22} /></span>
+      <span data-nav-icon="close" hidden><Icon name="x" size={22} /></span>
+    </button>
+  </div>
+
+  <div id="site-menu" class="border-t border-border bg-bg md:hidden" hidden data-nav-menu>
+    <nav class="container-content flex flex-col gap-1 py-3" aria-label="Mobile">
+      {
+        navItems.map((item) => (
+          <a href={item.href} class="rounded-md px-3 py-3 text-base font-medium text-fg-muted hover:bg-elevated hover:text-fg">
+            {item.label}
+          </a>
+        ))
+      }
+      <div class="mt-2 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+        <a
+          href={site.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-fg-muted hover:bg-elevated hover:text-fg"
+        >
+          <Icon name="github" size={16} />
+          GitHub
+        </a>
+        <a
+          href={site.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-fg-muted hover:bg-elevated hover:text-fg"
+        >
+          <Icon name="linkedin" size={16} />
+          LinkedIn
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import '@/scripts/nav';
+</script>

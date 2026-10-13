@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { SkillGroup } from '@/data/skills';
+
+interface Props {
+  group: SkillGroup;
+  index?: number;
+}
+const { group, index = 0 } = Astro.props;
+
+type SvgComponent = (props: Record<string, unknown>) => unknown;
+
+// Every SVG in src/assets/skills/ becomes an inline component; PNG/JPG/WebP files are
+// optimized rasters. Both are keyed by file name without extension.
+const svgModules = import.meta.glob<{ default: SvgComponent }>('/src/assets/skills/*.svg', { eager: true });
+const rasterModules = import.meta.glob<{ default: ImageMetadata }>('/src/assets/skills/*.{png,jpg,jpeg,webp}', {
+  eager: true,
+});
+const keyOf = (path: string) => path.split('/').pop()!.replace(/\.[a-z]+$/, '');
+const svgs: Record<string, SvgComponent> = Object.fromEntries(Object.entries(svgModules).map(([p, m]) => [keyOf(p), m.default]));
+const rasters: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(rasterModules).map(([p, m]) => [keyOf(p), m.default]),
+);
+---
+
+<div class="card p-5" data-reveal data-reveal-delay={String((index % 3) * 70)}>
+  <h3 class="mb-4 text-sm font-semibold text-fg">{group.name}</h3>
+  <ul class="grid grid-cols-2 gap-2">
+    {
+      group.items.map((item) => {
+        const Svg = svgs[item.icon];
+        const raster = rasters[item.icon];
+        if (!Svg && !raster) {
+          throw new Error(`Skill icon "${item.icon}" not found in src/assets/skills/ (used by "${item.name}")`);
+        }
+        const size = item.brand ? 20 : 22;
+        return (
+          <li class="flex min-w-0 items-center gap-2.5 rounded-lg border border-border bg-bg px-2.5 py-2">
+            <span
+              class:list={[
+                'grid h-9 shrink-0 place-items-center rounded-md',
+                item.wide ? 'w-[4.5rem]' : 'w-9',
+                item.brand ? 'border border-border bg-surface' : 'bg-accent-soft text-accent',
+              ]}
+              aria-hidden="true"
+            >
+              {Svg ? (
+                <Svg width={item.wide ? 56 : size} height={item.wide ? 10 : size} />
+              ) : (
+                <Image src={raster} alt="" width={size * 2} height={size * 2} format="png" class="size-6 object-contain" />
+              )}
+            </span>
+            <span class="min-w-0 text-[0.8125rem] font-medium leading-tight text-fg [overflow-wrap:anywhere]">{item.name}</span>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>

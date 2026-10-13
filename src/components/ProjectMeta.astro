@@ -1,0 +1,116 @@
+---
+import type { Project } from '@/lib/projects';
+import { categoryLabel, TYPE_LABELS } from '@/data/categories';
+import { formatRange } from '@/lib/dates';
+import Badge from './Badge.astro';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const { data } = project;
+const categories = [data.category, ...data.tags.filter((t) => t !== data.category)];
+---
+
+<aside class="card flex flex-col gap-5 p-5 text-sm" aria-label="Project details">
+  <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3">
+    <dt class="flex items-center gap-2 text-fg-subtle"><Icon name="calendar" size={14} />Timeline</dt>
+    <dd class="text-fg">{formatRange(data.dates.start, data.dates.end)}</dd>
+
+    <dt class="flex items-center gap-2 text-fg-subtle"><Icon name="tag" size={14} />Type</dt>
+    <dd class="text-fg">{TYPE_LABELS[data.type]}</dd>
+
+    {
+      data.affiliation && (
+        <>
+          <dt class="flex items-center gap-2 text-fg-subtle">
+            <Icon name="briefcase" size={14} />
+            Context
+          </dt>
+          <dd class="text-fg">{data.affiliation}</dd>
+        </>
+      )
+    }
+    {
+      data.team && (
+        <>
+          <dt class="flex items-center gap-2 text-fg-subtle">
+            <Icon name="users" size={14} />
+            Team
+          </dt>
+          <dd class="text-fg">{data.team}</dd>
+        </>
+      )
+    }
+    {
+      data.role && (
+        <>
+          <dt class="flex items-center gap-2 text-fg-subtle">
+            <Icon name="wrench" size={14} />
+            My role
+          </dt>
+          <dd class="text-fg">{data.role}</dd>
+        </>
+      )
+    }
+    <dt class="flex items-center gap-2 text-fg-subtle"><Icon name="git-branch" size={14} />Source</dt>
+    <dd class="text-fg">
+      {
+        data.repo ? (
+          <a href={data.repo} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-accent-2 hover:underline">
+            GitHub repository
+            <Icon name="arrow-up-right" size={12} />
+          </a>
+        ) : data.sourceStatus === 'closed' ? (
+          <span class="inline-flex items-center gap-1.5">
+            <Icon name="lock" size={12} />
+            Closed source
+          </span>
+        ) : (
+          'Not published'
+        )
+      }
+    </dd>
+  </dl>
+
+  <div>
+    <p class="mb-2 font-mono text-[0.6875rem] uppercase tracking-wider text-fg-subtle">Categories</p>
+    <div class="flex flex-wrap gap-1.5">
+      {categories.map((c) => <Badge variant="category">{categoryLabel(c, true)}</Badge>)}
+    </div>
+  </div>
+
+  {
+    data.tech.length > 0 && (
+      <div>
+        <p class="mb-2 font-mono text-[0.6875rem] uppercase tracking-wider text-fg-subtle">Technologies</p>
+        <ul class="flex flex-wrap gap-1.5">
+          {data.tech.map((t) => (
+            <li>
+              <Badge>{t}</Badge>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {
+    (data.repo || data.links.length > 0) && (
+      <div class="flex flex-col gap-2 border-t border-border pt-4">
+        {data.repo && (
+          <Button href={data.repo} variant="secondary" size="sm" icon="github" iconPosition="left" external class="justify-start">
+            View repository
+          </Button>
+        )}
+        {data.links.map((l) => (
+          <Button href={l.url} variant="ghost" size="sm" icon="arrow-up-right" external class="justify-start">
+            {l.label}
+          </Button>
+        ))}
+      </div>
+    )
+  }
+</aside>

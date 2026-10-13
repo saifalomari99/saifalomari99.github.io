@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+@import "./prose.css";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Light palette */
+  --color-bg: #fafbfc;
+  --color-surface: #ffffff;
+  --color-elevated: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-fg: #0f172a;
+  --color-fg-muted: #475569;
+  --color-fg-subtle: #64748b;
+  --color-accent: #2563eb;
+  --color-accent-2: #0e7490;
+  --color-accent-soft: rgb(37 99 235 / 0.08);
+  --color-accent-fg: #ffffff;
+
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -16px rgb(15 23 42 / 0.12);
+  --shadow-card-hover: 0 1px 2px rgb(15 23 42 / 0.05), 0 16px 32px -16px rgb(15 23 42 / 0.18);
+  --container-content: 68rem;
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    scroll-padding-top: 5rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  ::selection {
+    background: rgb(37 99 235 / 0.18);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@utility container-content {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-inline: 1rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Small section label */
+@utility eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+@utility card-hover {
+  transition:
+    border-color 220ms var(--ease-soft),
+    transform 220ms var(--ease-soft),
+    box-shadow 220ms var(--ease-soft);
+  &:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-card-hover);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/* Soft blue wash behind the hero, no images */
+@utility bg-hero {
+  background-image:
+    radial-gradient(60rem 30rem at 85% -10%, rgb(37 99 235 / 0.1), transparent 60%),
+    radial-gradient(40rem 20rem at 0% 110%, rgb(14 116 144 / 0.08), transparent 60%);
+}
+
+/* Scroll reveal: only hides content when JS is available and motion is allowed */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 600ms var(--ease-soft),
+      transform 600ms var(--ease-soft);
+  }
+  html.js [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  font-weight: 600;
+}
+.skip-link:focus {
+  top: 1rem;
+}

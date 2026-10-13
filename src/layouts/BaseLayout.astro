@@ -1,0 +1,36 @@
+---
+import BaseHead from '@/components/BaseHead.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import { getArticles } from '@/lib/projects';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description, ogImage, ogType, jsonLd, noindex } = Astro.props;
+const showWriting = (await getArticles()).length > 0;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} ogImage={ogImage} ogType={ogType} jsonLd={jsonLd} noindex={noindex} />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Nav showWriting={showWriting} />
+    <main id="main" tabindex="-1" class="flex-1 outline-none">
+      <slot />
+    </main>
+    <Footer showWriting={showWriting} />
+    <script>
+      import '@/scripts/reveal';
+    </script>
+  </body>
+</html>
