@@ -34,7 +34,7 @@ const og = `
   <text x="80" y="374" font-family="${FONT}" font-size="36" font-weight="600" fill="url(#accent)">${ROLE}</text>
   <text x="80" y="440" font-family="${FONT}" font-size="24" fill="#475569">RTL design · FPGA architecture · Embedded firmware · Verification · Engineering tools</text>
   <line x1="80" y1="520" x2="1120" y2="520" stroke="#e2e8f0" stroke-width="2"/>
-  <text x="80" y="566" font-family="${FONT}" font-size="22" fill="#64748b">Magna Electronics · M.S. ECE, UC Santa Barbara · Goleta, CA</text>
+  <text x="80" y="566" font-family="${FONT}" font-size="22" fill="#64748b">Magna Electronics · M.S. ECE, UC Santa Barbara</text>
 </svg>`;
 
 const icon = `

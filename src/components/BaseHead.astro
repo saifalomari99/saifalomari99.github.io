@@ -34,7 +34,6 @@ const person = {
   sameAs: [site.github, site.linkedin],
   worksFor: { '@type': 'Organization', name: 'Magna Electronics' },
   alumniOf: education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
-  address: { '@type': 'PostalAddress', addressLocality: 'Goleta', addressRegion: 'CA', addressCountry: 'US' },
   knowsAbout: ['FPGA Design', 'RTL Design', 'Verilog', 'SystemVerilog', 'Embedded Firmware', 'Digital Hardware Design'],
 };
 const ld = [person, ...jsonLd];

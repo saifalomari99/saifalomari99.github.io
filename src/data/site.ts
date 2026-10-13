@@ -10,10 +10,11 @@ export const site: SiteConfig = {
   description:
     'Project portfolio of Saif Alomari, Embedded Firmware and FPGA Engineer: RTL and FPGA designs, embedded firmware, hardware/software integration, and engineering tools such as the RTLStation IDE.',
   url: 'https://saifalomari99.github.io',
-  location: 'Goleta, CA',
   github: 'https://github.com/saifalomari99',
   githubHandle: 'saifalomari99',
   linkedin: 'https://www.linkedin.com/in/saif-alomari-profile/',
+  /** Shown in the footer; bump it when you publish a new revision. */
+  version: 'v1013',
   nav: [
     { label: 'Projects', href: '/#projects' },
     { label: 'Skills', href: '/#skills' },

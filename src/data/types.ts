@@ -8,10 +8,10 @@ export interface SiteConfig {
   role: string;
   description: string;
   url: string;
-  location: string;
   github: string;
   githubHandle: string;
   linkedin: string;
+  version: string;
   /** Section links for the single-page layout; use "/#id" so they work from sub-pages too. */
   nav: NavItem[];
 }

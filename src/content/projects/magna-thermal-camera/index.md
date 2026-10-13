@@ -52,7 +52,7 @@ credits:
 
 Magna's thermal sensing (night vision) system places an infrared video camera at the front of the vehicle and builds a detailed thermal image of the road scene from temperature differences smaller than a tenth of a degree. Detection algorithms running on a dedicated ECU, or on the OEM's central compute unit, identify animals, pedestrians, and cyclists more than 100 meters ahead and feed driver warnings and automated emergency braking.
 
-I work on the thermal camera program as an Embedded Firmware Engineer at Magna Electronics in Goleta, California.
+I work on the thermal camera program as an Embedded Firmware Engineer at Magna Electronics.
 
 ## Why thermal
 
