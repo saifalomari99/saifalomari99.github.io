@@ -14,6 +14,7 @@ import { skills } from '@/data/skills';
 import { getProjects, getArticles, articleUrl } from '@/lib/projects';
 import { formatLongDate } from '@/lib/dates';
 import portrait from '@/assets/portrait.jpg';
+import portraitMuseum from '@/assets/portrait-museum.jpg';
 
 const projects = await getProjects();
 const articles = (await getArticles()).slice(0, 3);
@@ -43,16 +44,25 @@ const featuredCount = projects.filter((p) => p.data.tier === 'featured').length;
         </ul>
       </div>
 
-      <div class="mx-auto w-full max-w-xs md:max-w-sm" data-reveal data-reveal-delay="100">
+      <div class="mx-auto grid w-full max-w-sm grid-cols-2 gap-4 md:max-w-md" data-reveal data-reveal-delay="100">
         <Image
           src={portrait}
           alt="Saif Alomari standing in front of the University of California, Santa Barbara entrance sign."
-          widths={[480, 720, 960]}
-          sizes="(min-width: 768px) 24rem, 20rem"
+          widths={[320, 480, 720]}
+          sizes="(min-width: 768px) 13.5rem, 11.5rem"
           format="webp"
           loading="eager"
           fetchpriority="high"
-          class="aspect-[4/5] w-full rounded-2xl border border-border object-cover shadow-[0_24px_48px_-24px_rgb(15_23_42_/_0.35)]"
+          class="aspect-[3/4] w-full rounded-2xl border border-border object-cover shadow-[0_24px_48px_-24px_rgb(15_23_42_/_0.35)]"
+        />
+        <Image
+          src={portraitMuseum}
+          alt="Saif Alomari standing beside a vintage computer exhibit beneath a wall-sized Intel Pentium die photo."
+          widths={[320, 480, 720]}
+          sizes="(min-width: 768px) 13.5rem, 11.5rem"
+          format="webp"
+          loading="eager"
+          class="mt-10 aspect-[3/4] w-full rounded-2xl border border-border object-cover shadow-[0_24px_48px_-24px_rgb(15_23_42_/_0.35)]"
         />
       </div>
     </div>
