@@ -21,10 +21,6 @@ thumbnail:
   src: ./images/01-pedestrian-detection.jpg
   alt: "Thermal camera view of two pedestrians crossing a street at night, each outlined by a red detection box."
   fit: cover
-hero:
-  src: ./images/hero.jpg
-  alt: "Magna thermal camera: a compact black camera module with a round lens on a machined aluminum housing."
-  caption: "Magna thermal camera module. Image: Magna International."
 gallery:
   - src: ./images/01-pedestrian-detection.jpg
     alt: "Thermal camera view of a street at night with two pedestrians crossing, each outlined by a red detection box."

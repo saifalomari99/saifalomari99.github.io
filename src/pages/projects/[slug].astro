@@ -36,9 +36,10 @@ const siteUrl = Astro.site ?? new URL(site.url);
 const pageUrl = new URL(projectUrl(project), siteUrl).toString();
 
 let ogImage: string | undefined;
-if (data.hero) {
+const ogSource = data.hero ?? data.thumbnail;
+if (ogSource) {
   const og = await getImage({
-    src: data.hero.src,
+    src: ogSource.src,
     width: 1200,
     height: 630,
     fit: 'cover',
